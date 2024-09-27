@@ -56,9 +56,17 @@ validator shares(params: ShareParams) {
         expect amount != 0
         when pos_datum.pos_side is {
           SideTrue ->
-            [(policy_id, pred_datum.true_position_name, amount)] == flatten_mint
+            assets.quantity_of(
+              pos_output.value,
+              policy_id,
+              pred_datum.true_position_name,
+            ) == amount && [(policy_id, pred_datum.true_position_name, amount)] == flatten_mint
           SideFalse ->
-            [(policy_id, pred_datum.false_position_name, amount)] == flatten_mint
+            assets.quantity_of(
+              pos_output.value,
+              policy_id,
+              pred_datum.false_position_name,
+            ) == amount && [(policy_id, pred_datum.false_position_name, amount)] == flatten_mint
         }
       }
       Reward { pred_in_idx } -> {
