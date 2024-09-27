@@ -1,5 +1,4 @@
 use aiken/crypto.{Blake2b_224, Hash, ScriptHash, VerificationKey}
-use cardano/address.{Address}
 use cardano/assets.{AssetName, PolicyId}
 
 pub type PubKeyHash =
@@ -25,7 +24,7 @@ pub type PositionRedeemer {
 }
 
 pub type PositionDatum {
-  pos_user_address: Address,
+  pos_user_pkh: PubKeyHash,
   pos_amount: Int,
   pos_batcher_fee: Int,
   pos_type: PositionType,
