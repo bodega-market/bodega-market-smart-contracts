@@ -235,3 +235,56 @@ test shares__mint_sidefalse() {
   let redeemer = Buy { pred_ref_idx: 0 }
   shares.mint(params, redeemer, share_policy_id, tx)
 }
+
+test shares__mint_reward() {
+  let pred_datum =
+    PredictionDatum {
+      true_position_name,
+      false_position_name,
+      dead_line: 1730394000000,
+      true_position_amount: 0,
+      false_position_amount: 0,
+      position_script_hash,
+      admin_fee: 200_000,
+      envelope_amount: 2_000_000,
+    }
+  let own_ref =
+    OutputReference {
+      transaction_id: #"b4971034feee28d07f157faf99b850f856d8da3494c70b19b521cfe690258e26",
+      output_index: 0,
+    }
+  let pred_input =
+    Input {
+      output_reference: own_ref,
+      output: Output {
+        address: from_script(#""),
+        value: assets.from_lovelace(2_000_000)
+          |> assets.add(pred_nft_id, pred_nft_name, 1),
+        datum: InlineDatum(pred_datum),
+        reference_script: None,
+      },
+    }
+  let mint = assets.from_asset(share_policy_id, false_position_name, -10)
+  let tx =
+    Transaction {
+      inputs: [pred_input],
+      reference_inputs: [],
+      outputs: [],
+      fee: 0,
+      mint,
+      certificates: [],
+      withdrawals: [],
+      validity_range: interval.everything,
+      extra_signatories: [],
+      redeemers: [],
+      datums: dict.empty,
+      id: #"0000000000000000000000000000000000000000000000000000000000000000",
+      votes: [],
+      proposal_procedures: [],
+      current_treasury_amount: None,
+      treasury_donation: None,
+    }
+  let params = ShareParams { usdm_asset, prediction_nft: prediction_nft_asset }
+  let redeemer = Reward { pred_in_idx: 0 }
+  shares.mint(params, redeemer, share_policy_id, tx)
+}
