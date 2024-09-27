@@ -4,14 +4,14 @@ use aiken/interval.{Finite, Interval, IntervalBound}
 use aiken/primitive/string
 use bodega/test_constants.{
   false_position_name, license_symbol, maximum_deadline_range, oracle_nft_asset,
-  pos_user_pkh, position_script_hash, pred_nft_id, pred_nft_name,
-  prediction_nft_asset, share_policy_id, true_position_name, usdm_asset, usdm_id,
-  usdm_name,
+  oracle_nft_id, oracle_nft_name, pos_user_pkh, position_script_hash,
+  pred_nft_id, pred_nft_name, prediction_nft_asset, share_policy_id,
+  true_position_name, usdm_asset, usdm_id, usdm_name,
 }
 use bodega/types.{
   Asset, BuyPos, OracleDatum, PositionDatum, PredApply, PredReward,
   PredUpdateSetting, PredWithdrawAdminFee, PredictionDatum, PredictionParams,
-  PredictionRedeemer, SideTrue,
+  PredictionRedeemer, RewardPos, SideTrue,
 }
 use bodega/utils.{find_license_deadline, find_posix_time_range}
 use cardano/address.{from_script, from_verification_key}
@@ -230,13 +230,13 @@ validator predictions(params: PredictionParams) {
               own_output_datum.true_position_amount,
             )
           }
-        let (num_shares, does_reward_correctly) =
+        let (num_shares, total_reward, does_reward_correctly) =
           list.foldl(
             pos_indices,
-            (0, True),
+            (0, 0, True),
             fn(curr, acc) {
               let (in_idx, out_idx) = curr
-              let (ns, reward_correctly) = acc
+              let (ns, sum_reward, reward_correctly) = acc
               expect Some(in) = list.at(inputs, in_idx)
               expect Some(out) = list.at(outputs, out_idx)
               expect InlineDatum(pos_inline_datum) = in.output.datum
@@ -251,9 +251,10 @@ validator predictions(params: PredictionParams) {
                 )
               expect curr_shares > 0
               let reward_amount =
-                curr_shares + curr_shares / total_winning * total_losing
+                curr_shares * ( total_winning + total_losing ) / total_winning
               (
                 ns + curr_shares,
+                sum_reward + reward_amount,
                 reward_correctly && assets.quantity_of(
                   out.value,
                   params.usdm_asset.policy_id,
@@ -286,7 +287,7 @@ validator predictions(params: PredictionParams) {
             assets.ada_policy_id,
             assets.ada_asset_name,
           )
-        expect input_usdm == output_usdm + num_shares
+        expect input_usdm == output_usdm + total_reward
         expect input_lovelace <= output_lovelace
         expect
           [(params.share_policy_id, oracle_datum.position_name, -num_shares)] == flatten(
@@ -476,6 +477,197 @@ test predictions__spend_apply() {
     }
   let pred_redeemer =
     PredApply {
+      own_input_idx: 0,
+      own_output_idx: 0,
+      license_idx: 2,
+      pos_indices: [(1, 1)],
+    }
+  predictions.spend(params, Some(pred_datum), pred_redeemer, own_ref, tx)
+}
+
+test predictions__spend_reward() {
+  let params =
+    PredictionParams {
+      prediction_nft: prediction_nft_asset,
+      oracle_nft: oracle_nft_asset,
+      share_policy_id,
+      usdm_asset,
+      license_symbol,
+      maximum_deadline_range,
+    }
+  let pred_datum =
+    PredictionDatum {
+      true_position_name,
+      false_position_name,
+      dead_line: 1730394000000,
+      true_position_amount: 6_000,
+      false_position_amount: 4_000,
+      position_script_hash,
+      admin_fee: 200_000,
+      envelope_amount: 2_000_000,
+    }
+  let own_ref =
+    OutputReference {
+      transaction_id: #"b4971034feee28d07f157faf99b850f856d8da3494c70b19b521cfe690258e26",
+      output_index: 0,
+    }
+  let pred_input =
+    Input {
+      output_reference: own_ref,
+      output: Output {
+        address: from_script(#""),
+        value: assets.from_lovelace(2_000_000)
+          |> assets.add(usdm_id, usdm_name, 10_000)
+          |> assets.add(pred_nft_id, pred_nft_name, 1),
+        datum: InlineDatum(pred_datum),
+        reference_script: None,
+      },
+    }
+  let pred_out_datum =
+    PredictionDatum {
+      true_position_name,
+      false_position_name,
+      dead_line: 1730394000000,
+      true_position_amount: 6_000,
+      false_position_amount: 4_000,
+      position_script_hash,
+      admin_fee: 200_000,
+      envelope_amount: 2_000_000,
+    }
+  let pred_out =
+    Output {
+      address: from_script(#""),
+      value: assets.from_lovelace(2_200_000)
+        |> assets.add(pred_nft_id, pred_nft_name, 1)
+        |> assets.add(usdm_id, usdm_name, 5_000),
+      datum: InlineDatum(pred_out_datum),
+      reference_script: None,
+    }
+  let pos_datum =
+    PositionDatum {
+      pos_user_pkh,
+      pos_amount: 3_000,
+      pos_batcher_fee: 300_000,
+      pos_type: RewardPos,
+      pos_side: SideTrue,
+    }
+  let pos_ref =
+    OutputReference {
+      transaction_id: #"b4971034feee28d07f157faf99b850",
+      output_index: 0,
+    }
+  let pos_input =
+    Input {
+      output_reference: pos_ref,
+      output: Output {
+        address: from_script(#"11"),
+        value: assets.zero
+          |> assets.add(share_policy_id, true_position_name, 3_000),
+        datum: InlineDatum(pos_datum),
+        reference_script: None,
+      },
+    }
+  let user_pos_out =
+    Output {
+      address: from_verification_key(pos_user_pkh),
+      value: assets.from_lovelace(2_000_000)
+        |> assets.add(usdm_id, usdm_name, 5_000),
+      datum: NoDatum,
+      reference_script: None,
+    }
+  let license_input =
+    Input {
+      output_reference: OutputReference {
+        transaction_id: #"07f157faf99b850b4971034feee28d",
+        output_index: 0,
+      },
+      output: Output {
+        address: from_script(#"12"),
+        value: assets.add(
+          assets.zero,
+          license_symbol,
+          string.to_bytearray(@"1727715600000"),
+          1,
+        ),
+        datum: NoDatum,
+        reference_script: None,
+      },
+    }
+  let license_output =
+    Output {
+      address: from_script(#"12"),
+      value: assets.add(
+        assets.zero,
+        license_symbol,
+        string.to_bytearray(@"1727715600000"),
+        1,
+      ),
+      datum: NoDatum,
+      reference_script: None,
+    }
+  let pred_ref_outref =
+    OutputReference {
+      transaction_id: #"f99b850b4971034feee28d07f157fa",
+      output_index: 0,
+    }
+  let pred_ref_input =
+    Input {
+      output_reference: pred_ref_outref,
+      output: Output {
+        address: from_script(#"13"),
+        value: assets.from_lovelace(2_000_000),
+        datum: NoDatum,
+        reference_script: Some(#""),
+      },
+    }
+  let oracle_datum = OracleDatum { position_name: true_position_name }
+  let oracle_ref =
+    OutputReference {
+      transaction_id: #"f99b85b4971034feee28d07f157faf99b850",
+      output_index: 0,
+    }
+  let oracle_input =
+    Input {
+      output_reference: oracle_ref,
+      output: Output {
+        address: from_script(#"11"),
+        value: assets.zero
+          |> assets.add(oracle_nft_id, oracle_nft_name, 1),
+        datum: InlineDatum(oracle_datum),
+        reference_script: None,
+      },
+    }
+  let mint = assets.from_asset(share_policy_id, true_position_name, -3000)
+  let tx =
+    Transaction {
+      inputs: [pred_input, pos_input, license_input],
+      reference_inputs: [pred_ref_input, oracle_input],
+      outputs: [pred_out, user_pos_out, license_output],
+      fee: 0,
+      mint,
+      certificates: [],
+      withdrawals: [],
+      validity_range: Interval {
+        lower_bound: IntervalBound {
+          bound_type: Finite(1727453227635),
+          is_inclusive: False,
+        },
+        upper_bound: IntervalBound {
+          bound_type: Finite(1727456400000),
+          is_inclusive: False,
+        },
+      },
+      extra_signatories: [],
+      redeemers: [],
+      datums: dict.empty,
+      id: #"0000000000000000000000000000000000000000000000000000000000000000",
+      votes: [],
+      proposal_procedures: [],
+      current_treasury_amount: None,
+      treasury_donation: None,
+    }
+  let pred_redeemer =
+    PredReward {
       own_input_idx: 0,
       own_output_idx: 0,
       license_idx: 2,
