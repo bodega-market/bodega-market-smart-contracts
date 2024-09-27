@@ -4,6 +4,7 @@ use bodega/types.{
   PredWithdrawAdminFee, PredictionDatum, PredictionParams, PredictionRedeemer,
 }
 use bodega/utils.{find_license_deadline, find_posix_time_range}
+use cardano/address.{from_verification_key}
 use cardano/assets.{flatten}
 use cardano/transaction.{
   InlineDatum, Input, Output, OutputReference, Transaction,
@@ -58,7 +59,8 @@ validator predictions(params: PredictionParams) {
               expect Some(out) = list.at(outputs, out_idx)
               expect InlineDatum(pos_inline_datum) = in.output.datum
               expect pos_datum: PositionDatum = pos_inline_datum
-              expect pos_datum.pos_user_address == out.address
+              expect
+                from_verification_key(pos_datum.pos_user_pkh) == out.address
               let num_true_shares =
                 assets.quantity_of(
                   in.output.value,
@@ -123,7 +125,7 @@ validator predictions(params: PredictionParams) {
             },
           )
         let flatten_own_output_value = assets.flatten(own_output.value)
-        expect list.length(flatten_own_output_value) <= 2
+        expect list.length(flatten_own_output_value) <= 3
         let input_usdm =
           assets.quantity_of(
             own_input.output.value,
@@ -229,7 +231,8 @@ validator predictions(params: PredictionParams) {
               expect Some(out) = list.at(outputs, out_idx)
               expect InlineDatum(pos_inline_datum) = in.output.datum
               expect pos_datum: PositionDatum = pos_inline_datum
-              expect pos_datum.pos_user_address == out.address
+              expect
+                from_verification_key(pos_datum.pos_user_pkh) == out.address
               let curr_shares =
                 assets.quantity_of(
                   in.output.value,
