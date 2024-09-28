@@ -49,6 +49,7 @@ pub type PredictionParams {
   usdm_asset: Asset,
   license_symbol: PolicyId,
   maximum_deadline_range: Int,
+  treasury_script_hash: ScriptHash,
 }
 
 pub type PredictionRedeemer {
@@ -64,8 +65,12 @@ pub type PredictionRedeemer {
     license_idx: Int,
     pos_indices: List<(Int, Int)>,
   }
-  PredWithdrawAdminFee
-  PredUpdateSetting
+  PredWithdrawAdminFee {
+    own_input_idx: Int,
+    own_output_idx: Int,
+    license_idx: Int,
+    treasury_out_idx: Int,
+  }
 }
 
 pub type OracleDatum {
