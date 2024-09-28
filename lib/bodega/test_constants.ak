@@ -32,6 +32,9 @@ pub const maximum_deadline_range = 1_000_000_000
 pub const pos_user_pkh =
   #"d48838fee1e840857dab28a04dd88193aec8c297b85d8150c0a1f5cc"
 
+pub const treasury_script_hash =
+  #"8193aec8c297b85d8150c0a1f5ccd48838fee1e840857dab28a04dd8"
+
 pub const prediction_nft_asset =
   Asset { policy_id: pred_nft_id, asset_name: pred_nft_name }
 
