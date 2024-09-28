@@ -1,6 +1,6 @@
 use aiken/collection/dict
 use aiken/collection/list
-use aiken/interval
+use aiken/interval.{Finite, Interval, IntervalBound}
 use bodega/test_constants.{
   false_position_name, pos_user_pkh, position_script_hash, pred_nft_id,
   pred_nft_name, prediction_nft_asset, share_policy_id, true_position_name,
@@ -9,6 +9,7 @@ use bodega/test_constants.{
 use bodega/types.{
   Asset, BuyPos, PositionDatum, PredictionDatum, SideFalse, SideTrue,
 }
+use bodega/utils.{find_posix_time_range}
 use cardano/address.{Address, Script, from_script}
 use cardano/assets.{PolicyId, flatten}
 use cardano/transaction.{
@@ -27,7 +28,14 @@ pub type ShareParams {
 
 validator shares(params: ShareParams) {
   mint(redeemer: ShareRedeemer, policy_id: PolicyId, self: Transaction) {
-    let Transaction { mint, inputs, reference_inputs, outputs, .. } = self
+    let Transaction {
+      mint,
+      inputs,
+      reference_inputs,
+      outputs,
+      validity_range,
+      ..
+    } = self
     let flatten_mint = flatten(mint)
     when redeemer is {
       Buy { pred_ref_idx } -> {
@@ -40,6 +48,9 @@ validator shares(params: ShareParams) {
           ) == 1
         expect InlineDatum(pred_output_datum) = pred_ref_input.output.datum
         expect pred_datum: PredictionDatum = pred_output_datum
+        let (start_valid_time_range, _end_valid_time_range) =
+          find_posix_time_range(validity_range)
+        expect start_valid_time_range < pred_datum.dead_line
         let pos_script_cred = Script(pred_datum.position_script_hash)
         let pos_outputs =
           list.filter(
@@ -151,7 +162,16 @@ test shares__mint_sidetrue() {
       mint,
       certificates: [],
       withdrawals: [],
-      validity_range: interval.everything,
+      validity_range: Interval {
+        lower_bound: IntervalBound {
+          bound_type: Finite(1727453227635),
+          is_inclusive: False,
+        },
+        upper_bound: IntervalBound {
+          bound_type: Finite(1727456400000),
+          is_inclusive: False,
+        },
+      },
       extra_signatories: [],
       redeemers: [],
       datums: dict.empty,
@@ -221,7 +241,16 @@ test shares__mint_sidefalse() {
       mint,
       certificates: [],
       withdrawals: [],
-      validity_range: interval.everything,
+      validity_range: Interval {
+        lower_bound: IntervalBound {
+          bound_type: Finite(1727453227635),
+          is_inclusive: False,
+        },
+        upper_bound: IntervalBound {
+          bound_type: Finite(1727456400000),
+          is_inclusive: False,
+        },
+      },
       extra_signatories: [],
       redeemers: [],
       datums: dict.empty,
