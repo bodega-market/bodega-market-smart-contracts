@@ -12,38 +12,6 @@
   },
   "validators": [
     {
-      "title": "license_mp.batcher_mp.mint",
-      "redeemer": {
-        "title": "redeemer",
-        "schema": {
-          "$ref": "#/definitions/license_mp~1LicenseRedeemer"
-        }
-      },
-      "parameters": [
-        {
-          "title": "admin_pkh",
-          "schema": {
-            "$ref": "#/definitions/PubKeyHash"
-          }
-        }
-      ],
-      "compiledCode": "5901510101003232323232323223225333004323232323253330093370e900018051baa001132533300a3370e900018059baa00313232533300f301200213232533300e323300100137586028602a602a602a602a00644a66602600229404c94ccc044cdc79bae301600200f14a2266006006002602c002266ebcdd399198008008011129998098008a5eb804c8ccc888c8cc00400400c894ccc064004400c4c8cc06cdd39980d9ba90063301b30180013301b30190014bd7019801801980e801180d8009bae30120013756602600266006006602e004602a0026e9ccc048dd3998091ba90053301230133010375400e660249810101004bd7025eb805281bab30120013012301230123012300e375400e2c6eb8c040004c030dd50018b1bae300e300b37540022c601a601c004601800260180046014002600c6ea800452613656375c002ae6955ceaab9e5573eae815d0aba21",
-      "hash": "11413f17e9dfa042e7f02ff99030560b186ad7be38736f4febb2c6f2"
-    },
-    {
-      "title": "license_mp.batcher_mp.else",
-      "parameters": [
-        {
-          "title": "admin_pkh",
-          "schema": {
-            "$ref": "#/definitions/PubKeyHash"
-          }
-        }
-      ],
-      "compiledCode": "5901510101003232323232323223225333004323232323253330093370e900018051baa001132533300a3370e900018059baa00313232533300f301200213232533300e323300100137586028602a602a602a602a00644a66602600229404c94ccc044cdc79bae301600200f14a2266006006002602c002266ebcdd399198008008011129998098008a5eb804c8ccc888c8cc00400400c894ccc064004400c4c8cc06cdd39980d9ba90063301b30180013301b30190014bd7019801801980e801180d8009bae30120013756602600266006006602e004602a0026e9ccc048dd3998091ba90053301230133010375400e660249810101004bd7025eb805281bab30120013012301230123012300e375400e2c6eb8c040004c030dd50018b1bae300e300b37540022c601a601c004601800260180046014002600c6ea800452613656375c002ae6955ceaab9e5573eae815d0aba21",
-      "hash": "11413f17e9dfa042e7f02ff99030560b186ad7be38736f4febb2c6f2"
-    },
-    {
       "title": "mint_shares.shares.mint",
       "redeemer": {
         "title": "redeemer",
@@ -114,38 +82,6 @@
       "hash": "637a8d5a42321f34160f0aac54e52e2b99aede213dac68219c62defe"
     },
     {
-      "title": "prediction_nft_mp.pred_nft_mp.mint",
-      "redeemer": {
-        "title": "_redeemer",
-        "schema": {
-          "$ref": "#/definitions/Data"
-        }
-      },
-      "parameters": [
-        {
-          "title": "seed",
-          "schema": {
-            "$ref": "#/definitions/cardano~1transaction~1OutputReference"
-          }
-        }
-      ],
-      "compiledCode": "59012f01010032323232323232225333003323232323253330083370e900018049baa0011323232533300b32330010013758602200644a66602000229404c94ccc038cdd7980998081baa301300200d14a22660060060026026002266ebcdd399198008008011129998080008a5eb804c8ccc888c8cc00400400c894ccc058004400c4c8cc060dd39980c1ba90063301830150013301830160014bd7019801801980d001180c0009bae300f0013756602000266006006602800460240026e9ccc03cdd3998079ba90033300f4c010f4e50524544494354494f4e5f4e4654003300f4c10101004bd7025eb8058dd59807980818081808180800098059baa005375c601a60146ea800458c030c034008c02c004c02c008c024004c014dd50008a4c26cacae6955ceaab9e5573eae815d0aba21",
-      "hash": "5e105eb892dcabb9ed394bbc24fb8c56dba470b1f72ba79beed951ab"
-    },
-    {
-      "title": "prediction_nft_mp.pred_nft_mp.else",
-      "parameters": [
-        {
-          "title": "seed",
-          "schema": {
-            "$ref": "#/definitions/cardano~1transaction~1OutputReference"
-          }
-        }
-      ],
-      "compiledCode": "59012f01010032323232323232225333003323232323253330083370e900018049baa0011323232533300b32330010013758602200644a66602000229404c94ccc038cdd7980998081baa301300200d14a22660060060026026002266ebcdd399198008008011129998080008a5eb804c8ccc888c8cc00400400c894ccc058004400c4c8cc060dd39980c1ba90063301830150013301830160014bd7019801801980d001180c0009bae300f0013756602000266006006602800460240026e9ccc03cdd3998079ba90033300f4c010f4e50524544494354494f4e5f4e4654003300f4c10101004bd7025eb8058dd59807980818081808180800098059baa005375c601a60146ea800458c030c034008c02c004c02c008c024004c014dd50008a4c26cacae6955ceaab9e5573eae815d0aba21",
-      "hash": "5e105eb892dcabb9ed394bbc24fb8c56dba470b1f72ba79beed951ab"
-    },
-    {
       "title": "predictions.predictions.spend",
       "datum": {
         "title": "option_datum",
@@ -191,10 +127,6 @@
     },
     "ByteArray": {
       "dataType": "bytes"
-    },
-    "Data": {
-      "title": "Data",
-      "description": "Any Plutus data."
     },
     "Int": {
       "dataType": "integer"
@@ -484,43 +416,6 @@
             {
               "title": "treasury_out_idx",
               "$ref": "#/definitions/Int"
-            }
-          ]
-        }
-      ]
-    },
-    "cardano/transaction/OutputReference": {
-      "title": "OutputReference",
-      "description": "An `OutputReference` is a unique reference to an output on-chain. The `output_index`\n corresponds to the position in the output list of the transaction (identified by its id)\n that produced that output",
-      "anyOf": [
-        {
-          "title": "OutputReference",
-          "dataType": "constructor",
-          "index": 0,
-          "fields": [
-            {
-              "title": "transaction_id",
-              "$ref": "#/definitions/ByteArray"
-            },
-            {
-              "title": "output_index",
-              "$ref": "#/definitions/Int"
-            }
-          ]
-        }
-      ]
-    },
-    "license_mp/LicenseRedeemer": {
-      "title": "LicenseRedeemer",
-      "anyOf": [
-        {
-          "title": "LicenseRedeemer",
-          "dataType": "constructor",
-          "index": 0,
-          "fields": [
-            {
-              "title": "dead_line",
-              "$ref": "#/definitions/ByteArray"
             }
           ]
         }
