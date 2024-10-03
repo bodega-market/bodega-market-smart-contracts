@@ -6,7 +6,7 @@
     "plutusVersion": "v3",
     "compiler": {
       "name": "Aiken",
-      "version": "v1.1.3+3d77b5c"
+      "version": "v1.1.4+79d0e45"
     },
     "license": "Apache-2.0"
   },
@@ -32,6 +32,9 @@
     },
     {
       "title": "mint_shares.shares.else",
+      "redeemer": {
+        "schema": {}
+      },
       "parameters": [
         {
           "title": "params",
@@ -70,6 +73,9 @@
     },
     {
       "title": "positions.positions.else",
+      "redeemer": {
+        "schema": {}
+      },
       "parameters": [
         {
           "title": "prediction_nft",
@@ -108,6 +114,9 @@
     },
     {
       "title": "predictions.predictions.else",
+      "redeemer": {
+        "schema": {}
+      },
       "parameters": [
         {
           "title": "params",
