@@ -48,9 +48,9 @@ validator shares(params: ShareParams) {
           ) == 1
         expect InlineDatum(pred_output_datum) = pred_ref_input.output.datum
         expect pred_datum: PredictionDatum = pred_output_datum
-        let (start_valid_time_range, _end_valid_time_range) =
+        let (_start_valid_time_range, end_valid_time_range) =
           find_posix_time_range(validity_range)
-        expect start_valid_time_range < pred_datum.dead_line
+        expect end_valid_time_range < pred_datum.dead_line
         let pos_script_cred = Script(pred_datum.position_script_hash)
         let pos_outputs =
           list.filter(
