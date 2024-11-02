@@ -9,7 +9,7 @@ use bodega/test_constants.{
 use bodega/types.{
   Asset, BuyPos, PositionDatum, PredictionDatum, SideFalse, SideTrue,
 }
-use bodega/utils.{find_posix_time_range}
+use bodega/utils.{decimals, find_posix_time_range}
 use cardano/address.{Address, Script, from_script}
 use cardano/assets.{PolicyId, flatten}
 use cardano/transaction.{
@@ -74,7 +74,7 @@ validator shares(params: ShareParams) {
             pos_output.value,
             params.usdm_asset.policy_id,
             params.usdm_asset.asset_name,
-          )
+          ) / decimals
         expect amount != 0
         when pos_datum.pos_side is {
           SideTrue ->
@@ -148,7 +148,7 @@ test shares__mint_sidetrue() {
     Output {
       address: from_script(position_script_hash),
       value: mint
-        |> assets.add(usdm_id, usdm_name, 10)
+        |> assets.add(usdm_id, usdm_name, 10 * decimals)
         |> assets.merge(assets.from_lovelace(2_500_000)),
       datum: InlineDatum(pos_datum),
       reference_script: None,
@@ -227,7 +227,7 @@ test shares__mint_sidefalse() {
     Output {
       address: from_script(position_script_hash),
       value: mint
-        |> assets.add(usdm_id, usdm_name, 10)
+        |> assets.add(usdm_id, usdm_name, 10 * decimals)
         |> assets.merge(assets.from_lovelace(2_500_000)),
       datum: InlineDatum(pos_datum),
       reference_script: None,

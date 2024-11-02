@@ -13,7 +13,7 @@ use bodega/types.{
   PredWithdrawAdminFee, PredictionDatum, PredictionParams, PredictionRedeemer,
   RewardPos, SideTrue,
 }
-use bodega/utils.{find_license_deadline, find_posix_time_range}
+use bodega/utils.{decimals, find_license_deadline, find_posix_time_range}
 use cardano/address.{from_script, from_verification_key}
 use cardano/assets.{flatten}
 use cardano/transaction.{
@@ -160,7 +160,8 @@ validator predictions(params: PredictionParams) {
             assets.ada_policy_id,
             assets.ada_asset_name,
           )
-        expect input_usdm + true_shares + false_shares <= output_usdm
+        expect
+          input_usdm + ( true_shares + false_shares ) * decimals <= output_usdm
         expect
           input_lovelace + batch_size * own_input_datum.admin_fee <= output_lovelace
         expect
@@ -251,7 +252,7 @@ validator predictions(params: PredictionParams) {
                 )
               expect curr_shares > 0
               let reward_amount =
-                curr_shares * ( total_winning + total_losing ) / total_winning
+                curr_shares * ( total_winning + total_losing ) * decimals / total_winning
               (
                 ns + curr_shares,
                 sum_reward + reward_amount,
@@ -441,7 +442,7 @@ test predictions__spend_apply() {
       address: from_script(#""),
       value: assets.from_lovelace(2_200_000)
         |> assets.add(pred_nft_id, pred_nft_name, 1)
-        |> assets.add(usdm_id, usdm_name, 10),
+        |> assets.add(usdm_id, usdm_name, 10 * decimals),
       datum: InlineDatum(pred_out_datum),
       reference_script: None,
     }
@@ -465,7 +466,7 @@ test predictions__spend_apply() {
         address: from_script(#"11"),
         value: assets.zero
           |> assets.add(share_policy_id, true_position_name, 10)
-          |> assets.add(usdm_id, usdm_name, 10),
+          |> assets.add(usdm_id, usdm_name, 10 * decimals),
         datum: InlineDatum(pos_datum),
         reference_script: None,
       },
@@ -579,7 +580,7 @@ test predictions__spend_reward() {
       output: Output {
         address: from_script(#""),
         value: assets.from_lovelace(2_000_000)
-          |> assets.add(usdm_id, usdm_name, 10_000)
+          |> assets.add(usdm_id, usdm_name, 10_000 * decimals)
           |> assets.add(pred_nft_id, pred_nft_name, 1),
         datum: InlineDatum(pred_datum),
         reference_script: None,
@@ -601,7 +602,7 @@ test predictions__spend_reward() {
       address: from_script(#""),
       value: assets.from_lovelace(2_200_000)
         |> assets.add(pred_nft_id, pred_nft_name, 1)
-        |> assets.add(usdm_id, usdm_name, 5_000),
+        |> assets.add(usdm_id, usdm_name, 5_000 * decimals),
       datum: InlineDatum(pred_out_datum),
       reference_script: None,
     }
@@ -633,7 +634,7 @@ test predictions__spend_reward() {
     Output {
       address: from_verification_key(pos_user_pkh),
       value: assets.from_lovelace(2_000_000)
-        |> assets.add(usdm_id, usdm_name, 5_000),
+        |> assets.add(usdm_id, usdm_name, 5_000 * decimals),
       datum: NoDatum,
       reference_script: None,
     }

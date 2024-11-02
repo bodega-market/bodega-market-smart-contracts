@@ -6,6 +6,8 @@ use aiken/primitive/string
 use cardano/assets.{PolicyId, Value}
 use cardano/transaction.{ValidityRange}
 
+pub const decimals = 1_000_000
+
 const minus_ascii_code = 45
 
 const zero_ascii_code = 48
