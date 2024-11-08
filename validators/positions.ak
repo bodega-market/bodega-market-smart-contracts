@@ -2,9 +2,9 @@ use aiken/collection/dict
 use aiken/collection/list
 use aiken/interval
 use bodega/test_constants.{
-  false_position_name, pos_user_pkh, position_script_hash, pred_nft_id,
-  pred_nft_name, prediction_nft_asset, share_policy_id, true_position_name,
-  usdm_id, usdm_name,
+  false_position_name, payment_id, payment_name, pos_user_pkh,
+  position_script_hash, pred_nft_id, pred_nft_name, prediction_nft_asset,
+  share_policy_id, true_position_name,
 }
 use bodega/types.{
   Asset, BuyPos, PositionDatum, PositionRedeemer, PredictionDatum, SideTrue,
@@ -57,7 +57,7 @@ test positions__spend() {
         address: from_script(#"11"),
         value: assets.zero
           |> assets.add(share_policy_id, true_position_name, 10)
-          |> assets.add(usdm_id, usdm_name, 10),
+          |> assets.add(payment_id, payment_name, 10),
         datum: InlineDatum(pos_datum),
         reference_script: None,
       },
@@ -71,6 +71,7 @@ test positions__spend() {
       false_position_amount: 0,
       position_script_hash,
       admin_fee: 200_000,
+      cur_total_fee: 0,
       envelope_amount: 2_000_000,
     }
   let own_ref =

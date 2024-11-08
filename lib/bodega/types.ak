@@ -39,6 +39,7 @@ pub type PredictionDatum {
   false_position_amount: Int,
   position_script_hash: ScriptHash,
   admin_fee: Int,
+  cur_total_fee: Int,
   envelope_amount: Int,
 }
 
@@ -46,7 +47,7 @@ pub type PredictionParams {
   prediction_nft: Asset,
   oracle_nft: Asset,
   share_policy_id: PolicyId,
-  usdm_asset: Asset,
+  payment_asset: Asset,
   license_symbol: PolicyId,
   maximum_deadline_range: Int,
   treasury_script_hash: ScriptHash,
