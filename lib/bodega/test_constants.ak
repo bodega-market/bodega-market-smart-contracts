@@ -1,4 +1,5 @@
 use bodega/types.{Asset}
+use cardano/assets
 
 pub const pred_nft_id =
   #"b5bab2940b09a2350d7814b3077822f622e740e3921812d6c58112bb"
@@ -13,9 +14,10 @@ pub const oracle_nft_name = #"323032345f454c454354494f4e5f4f5241434c455f4e4654"
 pub const share_policy_id =
   #"a5ff2c36e9eeb9655d06c0a2f02d9e200aa6f8db00d760acf62c0eba"
 
-pub const usdm_id = #"965f87c8322049a498f0803697298766e9e6b673c7ec120613048642"
+pub const payment_id =
+  #"965f87c8322049a498f0803697298766e9e6b673c7ec120613048642"
 
-pub const usdm_name = #"46414b455f5553444d"
+pub const payment_name = #"46414b455f5553444d"
 
 pub const license_symbol =
   #"fded0503f223bab933388a77348f2722548ac6fa6a3fef5831c41b6c"
@@ -41,4 +43,8 @@ pub const prediction_nft_asset =
 pub const oracle_nft_asset =
   Asset { policy_id: oracle_nft_id, asset_name: oracle_nft_name }
 
-pub const usdm_asset = Asset { policy_id: usdm_id, asset_name: usdm_name }
+pub const payment_asset =
+  Asset { policy_id: payment_id, asset_name: payment_name }
+
+pub const payment_asset__ada =
+  Asset { policy_id: assets.ada_policy_id, asset_name: assets.ada_asset_name }
