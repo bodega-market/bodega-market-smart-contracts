@@ -25,6 +25,7 @@ pub type PositionRedeemer {
 
 pub type PositionDatum {
   pos_user_pkh: PubKeyHash,
+  pos_user_stake_key: Option<PubKeyHash>,
   pos_amount: Int,
   pos_batcher_fee: Int,
   pos_type: PositionType,

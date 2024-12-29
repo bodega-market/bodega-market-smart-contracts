@@ -3,8 +3,8 @@ use aiken/collection/list
 use aiken/interval
 use bodega/test_constants.{
   false_position_name, payment_id, payment_name, pos_user_pkh,
-  position_script_hash, pred_nft_id, pred_nft_name, prediction_nft_asset,
-  share_policy_id, true_position_name,
+  pos_user_stake_key, position_script_hash, pred_nft_id, pred_nft_name,
+  prediction_nft_asset, share_policy_id, true_position_name, user_address_test,
 }
 use bodega/types.{
   Asset, BuyPos, PositionDatum, PositionRedeemer, PredictionDatum, SideTrue,
@@ -40,6 +40,7 @@ test positions__spend() {
   let pos_datum =
     PositionDatum {
       pos_user_pkh,
+      pos_user_stake_key: Some(pos_user_stake_key),
       pos_amount: 10,
       pos_batcher_fee: 300_000,
       pos_type: BuyPos,
@@ -54,7 +55,7 @@ test positions__spend() {
     Input {
       output_reference: pos_ref,
       output: Output {
-        address: from_script(#"11"),
+        address: user_address_test,
         value: assets.zero
           |> assets.add(share_policy_id, true_position_name, 10)
           |> assets.add(payment_id, payment_name, 10),
