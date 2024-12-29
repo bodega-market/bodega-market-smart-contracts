@@ -5,9 +5,9 @@ use aiken/primitive/string
 use bodega/test_constants.{
   false_position_name, license_symbol, maximum_deadline_range, oracle_nft_asset,
   oracle_nft_id, oracle_nft_name, payment_asset, payment_asset__ada, payment_id,
-  payment_name, pos_user_pkh, position_script_hash, pred_nft_id, pred_nft_name,
-  prediction_nft_asset, share_policy_id, treasury_script_hash,
-  true_position_name,
+  payment_name, pos_user_pkh, pos_user_stake_key, position_script_hash,
+  pred_nft_id, pred_nft_name, prediction_nft_asset, share_policy_id,
+  treasury_script_hash, true_position_name, user_address_test,
 }
 use bodega/types.{
   Asset, BuyPos, OracleDatum, PositionDatum, PredApply, PredReward,
@@ -15,7 +15,7 @@ use bodega/types.{
   RewardPos, SideTrue,
 }
 use bodega/utils.{decimals, find_license_deadline, find_posix_time_range}
-use cardano/address.{from_script, from_verification_key}
+use cardano/address.{from_script}
 use cardano/assets.{flatten}
 use cardano/transaction.{
   InlineDatum, Input, NoDatum, Output, OutputReference, Transaction,
@@ -70,8 +70,14 @@ validator predictions(params: PredictionParams) {
               expect Some(out) = list.at(outputs, out_idx)
               expect InlineDatum(pos_inline_datum) = in.output.datum
               expect pos_datum: PositionDatum = pos_inline_datum
-              expect
-                from_verification_key(pos_datum.pos_user_pkh) == out.address
+              let user_address =
+                when pos_datum.pos_user_stake_key is {
+                  Some(key) ->
+                    address.from_verification_key(pos_datum.pos_user_pkh)
+                      |> address.with_delegation_key(key)
+                  None -> address.from_verification_key(pos_datum.pos_user_pkh)
+                }
+              expect user_address == out.address
               let num_true_shares =
                 assets.quantity_of(
                   in.output.value,
@@ -244,8 +250,14 @@ validator predictions(params: PredictionParams) {
               expect Some(out) = list.at(outputs, out_idx)
               expect InlineDatum(pos_inline_datum) = in.output.datum
               expect pos_datum: PositionDatum = pos_inline_datum
-              expect
-                from_verification_key(pos_datum.pos_user_pkh) == out.address
+              let user_address =
+                when pos_datum.pos_user_stake_key is {
+                  Some(key) ->
+                    address.from_verification_key(pos_datum.pos_user_pkh)
+                      |> address.with_delegation_key(key)
+                  None -> address.from_verification_key(pos_datum.pos_user_pkh)
+                }
+              expect user_address == out.address
               let curr_shares =
                 assets.quantity_of(
                   in.output.value,
@@ -460,6 +472,7 @@ test predictions__spend_apply() {
   let pos_datum =
     PositionDatum {
       pos_user_pkh,
+      pos_user_stake_key: Some(pos_user_stake_key),
       pos_amount: 10,
       pos_batcher_fee: 300_000,
       pos_type: BuyPos,
@@ -484,7 +497,7 @@ test predictions__spend_apply() {
     }
   let user_pos_out =
     Output {
-      address: from_verification_key(pos_user_pkh),
+      address: user_address_test,
       value: assets.from_lovelace(2_000_000)
         |> assets.add(share_policy_id, true_position_name, 10),
       datum: InlineDatum(pos_datum),
@@ -622,6 +635,7 @@ test predictions__spend_reward() {
   let pos_datum =
     PositionDatum {
       pos_user_pkh,
+      pos_user_stake_key: Some(pos_user_stake_key),
       pos_amount: 3_000,
       pos_batcher_fee: 300_000,
       pos_type: RewardPos,
@@ -645,7 +659,7 @@ test predictions__spend_reward() {
     }
   let user_pos_out =
     Output {
-      address: from_verification_key(pos_user_pkh),
+      address: user_address_test,
       value: assets.from_lovelace(2_000_000)
         |> assets.add(payment_id, payment_name, 5_000 * decimals),
       datum: NoDatum,
@@ -936,6 +950,7 @@ test predictions__spend_apply__ada() {
   let pos_datum =
     PositionDatum {
       pos_user_pkh,
+      pos_user_stake_key: Some(pos_user_stake_key),
       pos_amount: 10,
       pos_batcher_fee: 300_000,
       pos_type: BuyPos,
@@ -960,7 +975,7 @@ test predictions__spend_apply__ada() {
     }
   let user_pos_out =
     Output {
-      address: from_verification_key(pos_user_pkh),
+      address: user_address_test,
       value: assets.from_lovelace(2_000_000)
         |> assets.add(share_policy_id, true_position_name, 10),
       datum: InlineDatum(pos_datum),
@@ -1106,6 +1121,7 @@ test predictions__spend_reward__ada() {
   let pos_datum =
     PositionDatum {
       pos_user_pkh,
+      pos_user_stake_key: Some(pos_user_stake_key),
       pos_amount: 3_000,
       pos_batcher_fee: 300_000,
       pos_type: RewardPos,
@@ -1129,7 +1145,7 @@ test predictions__spend_reward__ada() {
     }
   let user_pos_out =
     Output {
-      address: from_verification_key(pos_user_pkh),
+      address: user_address_test,
       value: assets.from_lovelace(2_000_000)
         |> assets.add(
             assets.ada_policy_id,

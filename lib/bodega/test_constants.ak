@@ -1,4 +1,5 @@
 use bodega/types.{Asset}
+use cardano/address
 use cardano/assets
 
 pub const pred_nft_id =
@@ -33,6 +34,13 @@ pub const maximum_deadline_range = 1_000_000_000
 
 pub const pos_user_pkh =
   #"d48838fee1e840857dab28a04dd88193aec8c297b85d8150c0a1f5cc"
+
+pub const pos_user_stake_key =
+  #"88193aec8c297b85d8150c0a1f5ccd48838fee1e840857dab28a04dd"
+
+pub const user_address_test =
+  address.from_verification_key(pos_user_pkh)
+    |> address.with_delegation_key(pos_user_stake_key)
 
 pub const treasury_script_hash =
   #"8193aec8c297b85d8150c0a1f5ccd48838fee1e840857dab28a04dd8"
