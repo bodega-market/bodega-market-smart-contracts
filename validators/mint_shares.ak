@@ -3,9 +3,9 @@ use aiken/collection/list
 use aiken/interval.{Finite, Interval, IntervalBound}
 use bodega/test_constants.{
   false_position_name, payment_asset, payment_asset__ada, payment_id,
-  payment_name, pos_user_pkh, pos_user_stake_key,
-  position_script_hash, pred_nft_id, pred_nft_name, prediction_nft_asset,
-  share_policy_id, true_position_name,
+  payment_name, pos_user_pkh, pos_user_stake_key, position_script_hash,
+  pred_nft_id, pred_nft_name, prediction_nft_asset, share_policy_id,
+  true_position_name,
 }
 use bodega/types.{
   Asset, BuyPos, PositionDatum, PredictionDatum, SideFalse, SideTrue,
